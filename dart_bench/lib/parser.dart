@@ -37,8 +37,8 @@ class Counter {
 }
 
 class Result {
-  final Map<String, int> topWords;
+  final Map<String, int> top_words;
   final Map<String, int> topLetters;
-  const Result(this.topWords, this.topLetters);
+  const Result(this.top_words, this.topLetters);
 }
 

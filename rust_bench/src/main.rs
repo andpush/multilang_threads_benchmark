@@ -1,35 +1,61 @@
 
 use std::collections::HashMap;
-use std::fs;
+use std::{fs, thread};
+use std::str::Chars;
+use std::sync::mpsc;
 use std::time::Instant;
 use regex::Regex;
+
+const ROUNDS: usize = 1000;
+const THREADS: usize = 10;
 
 fn main() {
 
     let contents = fs::read_to_string("../text.txt")
         .expect("Something went wrong reading the file");
-    parse(&contents);
+
+    let (tx, rx) = mpsc::channel();
+
+    let mut handles = Vec::with_capacity(THREADS);
+    for i in 0..THREADS {
+        let cont = "text text test";//String::from(&contents);
+        let tx1 = tx.clone();
+        let handle = thread::spawn(move || {
+            let mut result: CountResult = CountResult { top_words: vec![], top_letters: vec![] };
+            const ITER: usize = ROUNDS / THREADS;
+            println!("Iterations: {}", ITER);
+            let word_regex : Regex = Regex::new(r"[\W,.?!]+").unwrap();
+            for i in 0..ITER {
+                result = parse(&cont, &word_regex);
+            }
+            tx1.send(result).unwrap();
+        });
+        handles.push(handle);
+    }
+    let start = Instant::now();
+    handles.into_iter().for_each(|h| {
+        h.join().unwrap()
+    });
+
+    let duration = start.elapsed();
+    println!("Duration: {:?}", duration);
+
+    let received = rx.recv().unwrap();
+    println!("Top words: {:?}", received.top_words);
+    println!("Top letters: {:?}", received.top_letters);
 }
 
-fn parse(text: &str) {
-    let r = Regex::new(r"[\W,.?!]+").unwrap();
-    let s = text.to_ascii_lowercase();
+fn parse(text: &str, word_regex: &Regex) -> CountResult {
+    let text = text.to_ascii_lowercase();
     let mut words: Counter = Counter::new();
     let mut letters: Counter = Counter::new();
-
-    let start = Instant::now();
-    r.split(&s).for_each(|word| {
-        // println!("{:?}", word);
-        words.add(word.to_owned());
-        word.chars().for_each(|ch| letters.add(ch.to_string()));
+    word_regex.split(&text)
+        .map(|word| {
+        // words.add(word);
+        // word.chars().for_each(|ch| letters.add(String::from(ch).as_str()));
     });
-    // let mut wordList:Vec<Entry<&str, i32>> = words.iter()
-    let duration = start.elapsed();
-    println!("{:?}", duration);
-    println!("Top words: {:?}", words.top(10));
-    println!("Too letters: {:?}", letters.top(10));
+    return CountResult{ top_words: vec![("a".to_string(), 2)], top_letters: vec![("a".to_string(), 2)]};//top_letters: letters.top(10)};
 }
-
 
 #[derive(Debug)]
 pub struct Counter {
@@ -43,14 +69,20 @@ impl Counter
         Counter { _map: HashMap::new() }
     }
 
-    fn add(&mut self, key: String) {
-        *self._map.entry(key).or_insert(0) += 1;
+    fn add(&mut self, key: &str) {
+        *self._map.entry(key.to_owned()).or_insert(0) += 1;
     }
 
-    fn top(&self, limit: usize) -> Vec<(&str, i32)> {
+    fn top(&self, limit: usize) -> Vec<(String, i32)> {
         let mut values: Vec<(&str, i32)> = (&self._map).iter().map(|(k, v)|(k.as_str(),*v)).collect::<Vec<(&str, i32)>>();
         values.sort_by(|(_, v1), (_, v2)| v2.cmp(v1));
         values.truncate(limit);
-        values
+        values.iter().map(|(k, v)|(k.to_string(), *v)).collect()
     }
+}
+
+#[derive(Debug)]
+pub struct CountResult {
+    top_words: Vec<(String, i32)>,
+    top_letters: Vec<(String, i32)>,
 }

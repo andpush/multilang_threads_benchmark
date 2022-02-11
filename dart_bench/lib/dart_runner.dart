@@ -3,14 +3,14 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:async';
 
-const threads = 1000, rounds = 1000000;
+const THREADS = 10, ROUNDS = 1000;
 final String text = File("../text.txt").readAsStringSync();
 main() async {
   final sw = Stopwatch()
     ..start();
 
   var collector = <Future<Result>>[];
-  for (int i = 0; i < threads; i++) {
+  for (int i = 0; i < THREADS; i++) {
     collector.add(spawnThreads());
   }
 
@@ -21,7 +21,7 @@ main() async {
   print("Isolates finished in ${sw.elapsedMilliseconds} ms");
 
   Result r = await collector[0];
-  print("${r.topWords}\n${r.topLetters}");
+  print("${r.top_words}\n${r.topLetters}");
 
 }
 
@@ -34,7 +34,7 @@ Future<Result> spawnThreads() async {
 
 void _doWork(SendPort sendPort) {
   late Result result;
-  for (int i = 0; i < rounds / threads; i++) {
+  for (int i = 0; i < ROUNDS / THREADS; i++) {
     result = Parser(10).parse(text);
   }
   sendPort.send(result);
