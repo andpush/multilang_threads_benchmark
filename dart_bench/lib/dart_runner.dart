@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:async';
 
-const THREADS = 10, ROUNDS = 1000;
+const THREADS = 100, ROUNDS = 10000;
 final String text = File("../text.txt").readAsStringSync();
 main() async {
   final sw = Stopwatch()

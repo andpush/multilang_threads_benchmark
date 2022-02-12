@@ -6,8 +6,8 @@ use std::sync::mpsc;
 use std::time::Instant;
 use regex::Regex;
 
-const ROUNDS: usize = 1000;
-const THREADS: usize = 10;
+const ROUNDS: usize = 10000;
+const THREADS: usize = 100;
 
 fn main() {
 
@@ -18,15 +18,15 @@ fn main() {
 
     let mut handles = Vec::with_capacity(THREADS);
     for i in 0..THREADS {
-        let cont = "text text test";//String::from(&contents);
         let tx1 = tx.clone();
+        let c1 = contents.clone();
         let handle = thread::spawn(move || {
             let mut result: CountResult = CountResult { top_words: vec![], top_letters: vec![] };
             const ITER: usize = ROUNDS / THREADS;
             println!("Iterations: {}", ITER);
             let word_regex : Regex = Regex::new(r"[\W,.?!]+").unwrap();
             for i in 0..ITER {
-                result = parse(&cont, &word_regex);
+                result = parse(&c1, &word_regex);
             }
             tx1.send(result).unwrap();
         });
@@ -50,11 +50,11 @@ fn parse(text: &str, word_regex: &Regex) -> CountResult {
     let mut words: Counter = Counter::new();
     let mut letters: Counter = Counter::new();
     word_regex.split(&text)
-        .map(|word| {
-        // words.add(word);
-        // word.chars().for_each(|ch| letters.add(String::from(ch).as_str()));
+        .for_each(|word| {
+        words.add(word);
+        word.chars().for_each(|ch| letters.add(String::from(ch).as_str()));
     });
-    return CountResult{ top_words: vec![("a".to_string(), 2)], top_letters: vec![("a".to_string(), 2)]};//top_letters: letters.top(10)};
+    return CountResult{ top_words: words.top(10), top_letters: letters.top(10)};
 }
 
 #[derive(Debug)]
