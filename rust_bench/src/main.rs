@@ -23,7 +23,6 @@ fn main() {
         let handle = thread::spawn(move || {
             let mut result: CountResult = CountResult { top_words: vec![], top_letters: vec![] };
             const ITER: usize = ROUNDS / THREADS;
-            println!("Iterations: {}", ITER);
             let word_regex : Regex = Regex::new(r"[\W,.?!]+").unwrap();
             for i in 0..ITER {
                 result = parse(&c1, &word_regex);
