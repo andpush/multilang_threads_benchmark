@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class JavaRunner {
-    static final int THREADS = 100;
-    static final int ROUNDS = 10000;
+    static final int THREADS = 1000;
+    static final int ROUNDS = 100000;
     static String text;
 
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
