@@ -8,35 +8,21 @@ final String text = File("../text.txt").readAsStringSync();
 main() async {
   final sw = Stopwatch()
     ..start();
-
-  var collector = <Future<Result>>[];
-  for (int i = 0; i < THREADS; i++) {
-    collector.add(spawnThreads());
-  }
-
-  print("Isolates created in ${sw.elapsedMilliseconds} ms");
-
-  await Future.wait(collector);
-
-  print("Isolates finished in ${sw.elapsedMilliseconds} ms");
-
-  Result r = await collector[0];
-  print("${r.top_words}\n${r.topLetters}");
-
-}
-
-// Spawns an isolate
-Future<Result> spawnThreads() async {
   final p = ReceivePort();
-  await Isolate.spawn(_doWork, p.sendPort);
-  return await p.first;
+  for (int i = 0; i < THREADS; i++) {
+    Isolate.spawn(_doWork, p.sendPort);
+  }
+  print("Isolates created in ${sw.elapsedMilliseconds} ms");
+  // wait till all results received
+  Result r = await p.take(ROUNDS).last;
+  print("Isolates finished in ${sw.elapsedMilliseconds} ms");
+  print("${r.topWords}\n${r.topLetters}");
 }
+
 
 void _doWork(SendPort sendPort) {
-  late Result result;
   for (int i = 0; i < ROUNDS / THREADS; i++) {
-    result = Parser(10).parse(text);
+    sendPort.send(Parser(10).parse(text));
   }
-  sendPort.send(result);
 }
 
