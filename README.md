@@ -14,5 +14,10 @@
 * RUST: 30s (4.3s start)
 * Dart: 6.5s (100ms start)
 
+#### UPD Dec 2022: Same computer (M1), after update to MacOS Ventura, Rust 1.66, Dart 2.18:
+* JAVA: same
+* RUST: 21s (4s start)
+* Dart: 4s (30ms start)
+
 Let's try to improve Rust version by minimizing heap allocations, 
 see https://www.youtube.com/watch?v=nO-BFKyWYgE
