@@ -67,10 +67,11 @@ impl Counter
     }
 
     fn add(&mut self, key: &str) {
-        match self._map.get_mut(key) {
-            Some(val) => *val += 1,
-            _ => {self._map.insert(key.to_owned(), 1);}
-        };
+        if let Some(val) = self._map.get_mut(key) {
+            *val += 1;
+        } else {
+            self._map.insert(key.to_owned(), 1);
+        }
     }
 
     fn top(&self, limit: usize) -> Vec<(String, i32)> {
