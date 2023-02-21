@@ -21,7 +21,7 @@ fn main() {
         let r1 = word_regex.clone();
         thread::spawn(move || {
             const ITER: usize = ROUNDS / THREADS;
-            for _j in 0..ITER {
+            for _ in 0..ITER {
                 tx1.send(parse(&c1, &r1)).unwrap();
             }
         });
@@ -32,7 +32,7 @@ fn main() {
     let mut res = rx.recv().unwrap();
     println!("First result received in {:?}", start.elapsed());
     // get the rest of results
-    for _k in 1..ROUNDS {
+    for _ in 1..ROUNDS {
         res = rx.recv().unwrap();
     }
 
