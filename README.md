@@ -21,3 +21,10 @@
 
 Let's try to improve Rust version by minimizing heap allocations, 
 see https://www.youtube.com/watch?v=nO-BFKyWYgE
+
+#### UPD Feb 2023 (updated Rust to 1.67.1 some code changes + Tokio Async version)
+* Rust  Optimized 110 ms start, total 2.6s - @ Intel
+* Rust Tokio Optimized 80 ms start, total 2.3s - @ Intel
+* Java (OpenJDK 17.0.2) 12s (2.6s for start) - @ Intel
+* Dart 7s - @ Intel
+* All versions load the CPU equally to 1200% 
