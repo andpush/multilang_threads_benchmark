@@ -7,33 +7,34 @@ use regex::Regex;
 
 const ROUNDS: usize = 100000;
 const THREADS: usize = 1000;
+const ITER: usize = ROUNDS / THREADS;
 
 fn main() {
     let start = Instant::now();
     let contents = fs::read_to_string("../text.txt")
         .expect("Something went wrong reading the file");
 
-    let (tx, rx) = mpsc::channel();
+    let (tx, rx) = mpsc::sync_channel(100);
     let word_regex : Regex = Regex::new(r"[\W,.?!]+").unwrap();
     for _i in 0..THREADS {
         let tx1 = tx.clone();
         let c1 = contents.clone();
         let r1 = word_regex.clone();
         thread::spawn(move || {
-            const ITER: usize = ROUNDS / THREADS;
             for _ in 0..ITER {
-                tx1.send(parse(&c1, &r1)).unwrap();
+                tx1.send(parse(&c1, &r1)).expect("Could not send");
             }
         });
     }
     println!("Started in {:?}", start.elapsed());
 
     // get first result
-    let mut res = rx.recv().unwrap();
+    let res = rx.recv().unwrap();
     println!("First result received in {:?}", start.elapsed());
     // get the rest of results
     for _ in 1..ROUNDS {
-        res = rx.recv().unwrap();
+        let _res = rx.recv().unwrap();
+        assert_eq!(_res, res);
     }
 
     let duration = start.elapsed();
@@ -77,13 +78,14 @@ impl Counter
     fn top(&self, limit: usize) -> Vec<(String, i32)> {
         let mut values: Vec<(&str, i32)> = self._map.iter()
             .map(|(k, v)|(k.as_str(),*v)).collect::<Vec<(&str, i32)>>();
-        values.sort_by(|(_, v1), (_, v2)| v2.cmp(v1));
+        values.sort_by(|(k1, v1), (k2, v2)|
+            if v1 != v2 {v2.cmp(v1)} else {k1.cmp(k2)});
         values.truncate(limit);
         values.iter().map(|(k, v)|(k.to_string(), *v)).collect()
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct CountResult {
     top_words: Vec<(String, i32)>,
     top_letters: Vec<(String, i32)>,
