@@ -26,5 +26,5 @@ see https://www.youtube.com/watch?v=nO-BFKyWYgE
 * Rust  Optimized 110ms/2.6s @ Intel/rust1.67.1; 65ms/1.5s @ M1/rust1.67.1
 * Rust Tokio Optimized 80m/2.3s @ Intel/rust1.67.1; 19ms/1.4s @ M1/rust1.67.1
 * Java 2.6s/12s @ Intel/openjdk17; 250ms/1.6s @ M1/openjdk19 
-* Dart 30ms/7s @ Intel; 20ms/4s @ M1
+* Dart 30ms/7s @ Intel; 25ms/4s @ M1/dart2.19
 * All versions fully load the CPU
