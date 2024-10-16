@@ -17,17 +17,14 @@ public class Parser {
                 letterCounter.add(letter);
             }
         }
-        Result result = new Result();
-        result.topWords = wordCounter.top(limit);
-        result.topLetters = letterCounter.top(limit);
-        return result;
+        return new Result(wordCounter.top(limit), letterCounter.top(limit));
     }
 
 
-    public static class Result {
-        Map<String, Integer> topWords;
-        Map<Character, Integer> topLetters;
-    }
+    public record Result (
+        Map<String, Integer> topWords,
+        Map<Character, Integer> topLetters
+    ) {}
 
 
     static class Counter<T> {
