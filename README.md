@@ -29,7 +29,8 @@ see https://www.youtube.com/watch?v=nO-BFKyWYgE
 * Dart 30ms/7s @ Intel; 25ms/4s @ M1/dart2.19
 * All versions fully load the CPU
 
-#### UPD Oct 2024 (added Kotlin 2.0.10, JRE Temurin 21.0.4) Threads=1000, Rounds=100_000, Macbook Pro 2023 M3 Pro
-* Java 130/3400ms (if 100 threads - 180/2300ms) 
+#### UPD Oct 2024 (added Kotlin 2.0.10, Java with Virtual Threads JRE21) @ Macbook Pro 2023 M3 Pro
+* Java Platform Threads 110/3000ms 
+* Java Virtual Threads 80/900ms 
 * Kotlin 900ms 
 * Dart 10ms/1680ms 

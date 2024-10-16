@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 
 import java.util.concurrent.*;
 
-public class JavaRunner {
+public class MainPlatformThreads {
     static final int THREADS = 1000;
     static final int ROUNDS = 100_000;
     static String text;
@@ -16,7 +16,7 @@ public class JavaRunner {
         Future<Parser.Result> f = null;
         try (ExecutorService es = Executors.newFixedThreadPool(THREADS)) {
             for (int i = 0; i < ROUNDS; i++) {
-                f = es.submit(JavaRunner::_doInBackground);
+                f = es.submit(()-> new Parser(10).parse(text));
             }
             System.out.println("Started thread pool in " + (System.currentTimeMillis() - start) + " ms ");
             es.shutdown();
@@ -25,10 +25,6 @@ public class JavaRunner {
         System.out.println(f.get().topWords());
         System.out.println(f.get().topLetters());
 
-    }
-
-    private static Parser.Result _doInBackground() {
-        return new Parser(10).parse(text);
     }
 
 

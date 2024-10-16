@@ -1,7 +1,6 @@
 import 'package:dart_bench/parser.dart';
 import 'dart:io';
 import 'dart:isolate';
-import 'dart:async';
 
 const THREADS = 1000, ROUNDS = 100000;
 final String text = File("../text.txt").readAsStringSync();
@@ -10,7 +9,7 @@ main() async {
     ..start();
   final p = ReceivePort();
   for (int i = 0; i < THREADS; i++) {
-    Isolate.spawn(_doWork, p.sendPort);
+    Isolate.spawn(_bgTask, p.sendPort);
   }
   print("Isolates created in ${sw.elapsedMilliseconds} ms");
   // wait till all results received
@@ -20,7 +19,7 @@ main() async {
 }
 
 
-void _doWork(SendPort sendPort) {
+void _bgTask(SendPort sendPort) {
   for (int i = 0; i < ROUNDS / THREADS; i++) {
     sendPort.send(Parser(10).parse(text));
   }
